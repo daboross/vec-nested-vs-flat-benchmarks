@@ -79,8 +79,8 @@ fn loop_nested(v: &Vec<Vec<u16>>) {
 
 fn benchmark_nested(c: &mut Criterion) {
     let mut group = c.benchmark_group(&format!("nested vec of {}", OUTER_VEC_SIZE));
-    group.sample_size(100);
-    group.measurement_time(Duration::from_secs(60));
+    group.sample_size(50);
+    group.measurement_time(Duration::from_secs(60 * 30));
 
     group.bench_function("alloc", |b| b.iter(|| alloc_nested()));
     let nested = alloc_nested();
@@ -92,8 +92,8 @@ fn benchmark_nested(c: &mut Criterion) {
 
 fn benchmark_flat(c: &mut Criterion) {
     let mut group = c.benchmark_group(&format!("flat vec of {}", OUTER_VEC_SIZE));
-    group.sample_size(100);
-    group.measurement_time(Duration::from_mins(60));
+    group.sample_size(50);
+    group.measurement_time(Duration::from_secs(60 * 30));
 
     group.bench_function("alloc", |b| b.iter(|| alloc_flat()));
     let flat = alloc_flat();
