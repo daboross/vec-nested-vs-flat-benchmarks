@@ -8,11 +8,21 @@ fn alloc_flat() -> Vec<u16> {
     vec![0; 60 * OUTER_VEC_SIZE]
 }
 
-fn loop_flat(v: &Vec<u16>) {
+fn loop_flat_bad_iteration_order(v: &Vec<u16>) {
     let mut _counter = 0;
     for _i in 0..OUTER_VEC_SIZE {
         for _j in 0..60 {
-            _counter += v[_i * OUTER_VEC_SIZE + _j];
+            _counter += v[_j * OUTER_VEC_SIZE + _i];
+        }
+    }
+    black_box(_counter);
+}
+
+fn loop_flat_correct_iteration_order(v: &Vec<u16>) {
+    let mut _counter = 0;
+    for _i in 0..OUTER_VEC_SIZE {
+        for _j in 0..60 {
+            _counter += v[_i * 60 + _j];
         }
     }
     black_box(_counter);
@@ -27,7 +37,7 @@ fn loop_flat_explicit_size_assert(v: &Vec<u16>) {
     let mut _counter = 0;
     for _i in 0..OUTER_VEC_SIZE {
         for _j in 0..60 {
-            _counter += v[_i * OUTER_VEC_SIZE + _j];
+            _counter += v[_i * 60 + _j];
         }
     }
     black_box(_counter);
@@ -67,8 +77,13 @@ fn benchmark_flat(c: &mut Criterion) {
 
     group.bench_function("alloc", |b| b.iter(|| alloc_flat()));
     let flat = alloc_flat();
-    group.bench_function("loop", |b| b.iter(|| loop_flat(black_box(&flat))));
-    group.bench_function("loop with assert", |b| {
+    group.bench_function("loop with bad order", |b| {
+        b.iter(|| loop_flat_bad_iteration_order(black_box(&flat)))
+    });
+    group.bench_function("loop with good order", |b| {
+        b.iter(|| loop_flat_correct_iteration_order(black_box(&flat)))
+    });
+    group.bench_function("loop with assert, good order", |b| {
         b.iter(|| loop_flat_explicit_size_assert(black_box(&flat)))
     });
 }
