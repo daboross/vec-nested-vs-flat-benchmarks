@@ -12,7 +12,7 @@ fn loop_flat(v: &Vec<u16>) {
     let mut _counter = 0;
     for _i in 0..OUTER_VEC_SIZE {
         for _j in 0..60 {
-            _counter += v[_j * OUTER_VEC_SIZE + _i];
+            _counter += v[_i * OUTER_VEC_SIZE + _j];
         }
     }
     black_box(_counter);
@@ -22,12 +22,12 @@ fn loop_flat_explicit_size_assert(v: &Vec<u16>) {
     // This helps the compiler elide bounds checks when doing non-Iterator-based iteration:
     // if the bounds are broken, it explicitly panics early, so it shouldn't need to test
     // those bounds later.
-    assert!(v.len() >= OUTER_VEC_SIZE);
+    assert!(v.len() >= OUTER_VEC_SIZE * 60);
 
     let mut _counter = 0;
     for _i in 0..OUTER_VEC_SIZE {
         for _j in 0..60 {
-            _counter += v[_j * OUTER_VEC_SIZE + _i];
+            _counter += v[_i * OUTER_VEC_SIZE + _j];
         }
     }
     black_box(_counter);
