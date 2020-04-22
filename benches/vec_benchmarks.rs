@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-const OUTER_VEC_SIZE: usize = 10_000_000;
+const OUTER_VEC_SIZE: usize = 100_000_000;
 
 fn alloc_flat() -> Vec<u16> {
     vec![0; 60 * OUTER_VEC_SIZE]
@@ -79,8 +79,8 @@ fn loop_nested(v: &Vec<Vec<u16>>) {
 
 fn benchmark_nested(c: &mut Criterion) {
     let mut group = c.benchmark_group(&format!("nested vec of {}", OUTER_VEC_SIZE));
-    group.sample_size(10);
-    group.measurement_time(Duration::from_secs(400));
+    group.sample_size(100);
+    group.measurement_time(Duration::from_secs(60));
 
     group.bench_function("alloc", |b| b.iter(|| alloc_nested()));
     let nested = alloc_nested();
@@ -92,8 +92,8 @@ fn benchmark_nested(c: &mut Criterion) {
 
 fn benchmark_flat(c: &mut Criterion) {
     let mut group = c.benchmark_group(&format!("flat vec of {}", OUTER_VEC_SIZE));
-    group.sample_size(10);
-    group.measurement_time(Duration::from_secs(400));
+    group.sample_size(100);
+    group.measurement_time(Duration::from_mins(60));
 
     group.bench_function("alloc", |b| b.iter(|| alloc_flat()));
     let flat = alloc_flat();
