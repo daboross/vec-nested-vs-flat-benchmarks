@@ -22,7 +22,7 @@ fn loop_flat_explicit_size_assert(v: &Vec<u16>) {
     // This helps the compiler elide bounds checks when doing non-Iterator-based iteration:
     // if the bounds are broken, it explicitly panics early, so it shouldn't need to test
     // those bounds later.
-    assert!(v.len() >= OUTER_VEC_SIZE * 60);
+    assert_eq!(v.len(), OUTER_VEC_SIZE * 60);
 
     let mut _counter = 0;
     for i in 0..OUTER_VEC_SIZE {
@@ -38,7 +38,7 @@ fn loop_flat_explicit_size_assert_unchecked(v: &Vec<u16>) {
     // This helps the compiler elide bounds checks when doing non-Iterator-based iteration:
     // if the bounds are broken, it explicitly panics early, so it shouldn't need to test
     // those bounds later.
-    assert!(v.len() >= OUTER_VEC_SIZE * 60);
+    assert_eq!(v.len(), OUTER_VEC_SIZE * 60);
 
     let mut _counter = 0;
     for i in 0..OUTER_VEC_SIZE {
