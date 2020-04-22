@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
-const OUTER_VEC_SIZE: usize = 10000000;
+const OUTER_VEC_SIZE: usize = 10_000_000;
 
 fn alloc_flat() -> Vec<u16> {
     vec![0; 60 * OUTER_VEC_SIZE]
@@ -34,7 +34,7 @@ fn loop_flat_explicit_size_assert(v: &Vec<u16>) {
 }
 
 fn alloc_nested() -> Vec<Vec<u16>> {
-    vec![vec![0; 60]; 10000000]
+    vec![vec![0; 60]; OUTER_VEC_SIZE]
 }
 
 fn loop_nested(v: &Vec<Vec<u16>>) {
