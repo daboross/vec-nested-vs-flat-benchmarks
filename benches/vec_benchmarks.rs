@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 const OUTER_VEC_SIZE: usize = 10000000;
@@ -46,28 +48,29 @@ fn loop_nested(v: &Vec<Vec<u16>>) {
 }
 
 fn benchmark_nested(c: &mut Criterion) {
-    c.bench_function(&format!("nested: alloc {}", OUTER_VEC_SIZE), |b| {
-        b.iter(|| alloc_nested())
-    });
+    let mut group = c.benchmark_group(&format!("nested vec of {}", OUTER_VEC_SIZE));
+    group.sample_size(10);
+    group.measurement_time(Duration::from_secs(400));
+
+    group.bench_function("alloc", |b| b.iter(|| alloc_nested()));
     let nested = alloc_nested();
-    c.bench_function(&format!("nested: loop over {}", OUTER_VEC_SIZE), |b| {
-    // use black_box to ensure the compiler can't tell what's inside the vec.
+    group.bench_function("loop", |b| {
+        // use black_box to ensure the compiler can't tell what's inside the vec.
         b.iter(|| loop_nested(black_box(&nested)))
     });
 }
 
 fn benchmark_flat(c: &mut Criterion) {
-    c.bench_function(&format!("flat: alloc {}", OUTER_VEC_SIZE), |b| {
-        b.iter(|| alloc_flat())
-    });
+    let mut group = c.benchmark_group(&format!("flat vec of {}", OUTER_VEC_SIZE));
+    group.sample_size(10);
+    group.measurement_time(Duration::from_secs(400));
+
+    group.bench_function("alloc", |b| b.iter(|| alloc_flat()));
     let flat = alloc_flat();
-    c.bench_function(&format!("flat: loop over {}", OUTER_VEC_SIZE), |b| {
-        b.iter(|| loop_flat(black_box(&flat)))
+    group.bench_function("loop", |b| b.iter(|| loop_flat(black_box(&flat))));
+    group.bench_function("loop with assert", |b| {
+        b.iter(|| loop_flat_explicit_size_assert(black_box(&flat)))
     });
-    c.bench_function(
-        &format!("flat: loop over {} with explicit assert", OUTER_VEC_SIZE),
-        |b| b.iter(|| loop_flat_explicit_size_assert(black_box(&flat))),
-    );
 }
 
 criterion_group!(vec_benchmarks, benchmark_flat, benchmark_nested);
