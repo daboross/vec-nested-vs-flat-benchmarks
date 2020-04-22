@@ -43,6 +43,26 @@ fn loop_flat_explicit_size_assert(v: &Vec<u16>) {
     black_box(_counter);
 }
 
+fn loop_flat_iterator(v: &Vec<u16>) {
+    let mut _counter = 0;
+
+    for (idx, val) in v.iter().enumerate() {
+        // these aren't used so they'll be optimized out - they're just here to show how this
+        // style could be used practically.
+        let _i = idx / 60;
+        let _j = idx % 60;
+        _counter += val;
+    }
+
+    let mut _counter = 0;
+    for _i in 0..OUTER_VEC_SIZE {
+        for _j in 0..60 {
+            _counter += v[_i * 60 + _j];
+        }
+    }
+    black_box(_counter);
+}
+
 fn alloc_nested() -> Vec<Vec<u16>> {
     vec![vec![0; 60]; OUTER_VEC_SIZE]
 }
@@ -85,6 +105,9 @@ fn benchmark_flat(c: &mut Criterion) {
     });
     group.bench_function("loop with assert, good order", |b| {
         b.iter(|| loop_flat_explicit_size_assert(black_box(&flat)))
+    });
+    group.bench_function("loop with iterator, good order", |b| {
+        b.iter(|| loop_flat_iterator(black_box(&flat)))
     });
 }
 
